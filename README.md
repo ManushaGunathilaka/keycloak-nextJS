@@ -34,3 +34,14 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+docker run -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:latest start-dev
+
+#.env.local
+KEYCLOAK_CLIENT_ID="nextjs"
+KEYCLOAK_CLIENT_SECRET="m8j6FLub6xqtmtK3NLwBDTZIITzzVHu6"
+KEYCLOAK_ISSUER="http://localhost:8080/realms/nextjs-kc"
+
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="Jst+BI3EgSQ1EEa+NIRc9O7QIgg9bqIKD8YKXR7CEkg="
