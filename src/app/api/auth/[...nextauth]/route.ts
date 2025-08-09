@@ -44,6 +44,7 @@ export const authOptions: AuthOptions = {
         return token;
       }
       if (Date.now() < token.expiresAt! * 1000 - 60 * 1000) {
+        console.log("token:", token);
         return token;
       } else {
         try {
@@ -62,6 +63,7 @@ export const authOptions: AuthOptions = {
             ),
             refreshToken: tokens.refresh_token ?? token.refreshToken,
           };
+          console.log("updatedToken:", updatedToken);
           return updatedToken;
         } catch (error) {
           console.error("Error refreshing access token", error);
@@ -70,6 +72,7 @@ export const authOptions: AuthOptions = {
       }
     },
     async session({ session, token }) {
+      console.log("session token", token);
       session.accessToken = token.accessToken;
       session.error = token.error;
       return session;

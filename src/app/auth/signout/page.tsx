@@ -7,8 +7,8 @@ export default async function SignoutPage() {
   const session = await getServerSession(authOptions);
   if (session) {
     return (
-      <div>
-        <div>Signout</div>
+      <div className="flex flex-col space-y-3 justify-center items-center h-screen">
+        <div className="text-xl font-bold">Signout</div>
         <div>Are you sure you want to sign out?</div>
         <div>
           <Logout />
