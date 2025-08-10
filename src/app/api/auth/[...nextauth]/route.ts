@@ -1,3 +1,4 @@
+// src/app/api/auth/[...nextauth]/route.ts
 import { AuthOptions, TokenSet } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import NextAuth from "next-auth/next";
@@ -7,8 +8,8 @@ function requestRefreshOfAccessToken(token: JWT) {
   return fetch(`${process.env.KEYCLOAK_ISSUER}/protocol/openid-connect/token`, {
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
-      client_id: process.env.KEYCLOAK_CLIENT_ID,
-      client_secret: process.env.KEYCLOAK_CLIENT_SECRET,
+      client_id: process.env.KEYCLOAK_CLIENT_ID!,
+      client_secret: process.env.KEYCLOAK_CLIENT_SECRET!,
       grant_type: "refresh_token",
       refresh_token: token.refreshToken!,
     }),
@@ -20,19 +21,17 @@ function requestRefreshOfAccessToken(token: JWT) {
 export const authOptions: AuthOptions = {
   providers: [
     KeycloakProvider({
-      clientId: process.env.KEYCLOAK_CLIENT_ID,
-      clientSecret: process.env.KEYCLOAK_CLIENT_SECRET,
-      issuer: process.env.KEYCLOAK_ISSUER,
+      clientId: process.env.KEYCLOAK_CLIENT_ID!,
+      clientSecret: process.env.KEYCLOAK_CLIENT_SECRET!,
+      issuer: process.env.KEYCLOAK_ISSUER!,
     }),
   ],
   pages: {
     signIn: "/auth/signin",
-    signOut: "/auth/signout",
   },
-  //Store session data in a JWT (browser cookie) instead of the DB.
   session: {
     strategy: "jwt",
-    maxAge: 60 * 30, //Token is valid for 30 minutes before needing a refresh.
+    maxAge: 60 * 30,
   },
   callbacks: {
     async jwt({ token, account }) {
@@ -41,21 +40,34 @@ export const authOptions: AuthOptions = {
         token.accessToken = account.access_token;
         token.refreshToken = account.refresh_token;
         token.expiresAt = account.expires_at;
+
+        // Extract roles from Keycloak token
+        if (account.access_token) {
+          try {
+            const payload = JSON.parse(
+              atob(account.access_token.split(".")[1])
+            );
+            token.roles = payload.realm_access?.roles || [];
+          } catch (error) {
+            console.error("Error parsing access token:", error);
+            token.roles = [];
+          }
+        }
+
         return token;
       }
+
       if (Date.now() < token.expiresAt! * 1000 - 60 * 1000) {
-        console.log("token:", token);
         return token;
       } else {
         try {
           const response = await requestRefreshOfAccessToken(token);
-
           const tokens: TokenSet = await response.json();
 
           if (!response.ok) throw tokens;
 
           const updatedToken: JWT = {
-            ...token, // Keep the previous token properties
+            ...token,
             idToken: tokens.id_token,
             accessToken: tokens.access_token,
             expiresAt: Math.floor(
@@ -63,7 +75,19 @@ export const authOptions: AuthOptions = {
             ),
             refreshToken: tokens.refresh_token ?? token.refreshToken,
           };
-          console.log("updatedToken:", updatedToken);
+
+          // Update roles from new token
+          if (tokens.access_token) {
+            try {
+              const payload = JSON.parse(
+                atob(tokens.access_token.split(".")[1])
+              );
+              updatedToken.roles = payload.realm_access?.roles || [];
+            } catch (error) {
+              console.error("Error parsing refreshed access token:", error);
+            }
+          }
+
           return updatedToken;
         } catch (error) {
           console.error("Error refreshing access token", error);
@@ -72,14 +96,13 @@ export const authOptions: AuthOptions = {
       }
     },
     async session({ session, token }) {
-      console.log("session token", token);
       session.accessToken = token.accessToken;
       session.error = token.error;
+      session.roles = token.roles;
       return session;
     },
   },
 };
 
 const handler = NextAuth(authOptions);
-
 export { handler as GET, handler as POST };
