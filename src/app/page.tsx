@@ -7,6 +7,7 @@ export default async function Home() {
   const session = await getServerSession(authOptions);
 
   if (!session) {
+    // Redirect directly to NextAuth signin which will show Keycloak login
     redirect("/api/auth/signin");
   }
 

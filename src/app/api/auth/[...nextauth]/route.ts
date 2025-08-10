@@ -26,9 +26,8 @@ export const authOptions: AuthOptions = {
       issuer: process.env.KEYCLOAK_ISSUER!,
     }),
   ],
-  pages: {
-    signIn: "/auth/signin",
-  },
+  // Remove custom signin page to use default NextAuth signin
+  // This will redirect directly to Keycloak
   session: {
     strategy: "jwt",
     maxAge: 60 * 30,
