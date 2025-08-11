@@ -10,7 +10,6 @@ export default async function Advertisement() {
       <h1>Advertisement</h1>
       <p>Welcome to the advertisement section, {session?.user?.name}!</p>
       <p>This page is accessible to both admin and user roles.</p>
-      <p>Manage your advertisements here...</p>
     </div>
   );
 }

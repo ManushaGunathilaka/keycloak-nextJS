@@ -9,21 +9,8 @@ interface HeaderProps {
 
 export default function Header({ user }: HeaderProps) {
   return (
-    <header
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: "10px 20px",
-        backgroundColor: "#fff",
-        borderBottom: "1px solid #ddd",
-      }}
-    >
-      <div>
-        <h1 style={{ margin: 0, fontSize: "24px" }}>Dashboard</h1>
-      </div>
-
-      <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
+    <header className="flex justify-end px-5 py-2 bg-white border-b border-gray-300">
+      <div className="flex items-center gap-4">
         <span>Welcome, {user?.name}</span>
         <Logout />
       </div>

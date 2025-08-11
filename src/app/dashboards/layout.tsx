@@ -16,11 +16,11 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div style={{ display: "flex", height: "100vh" }}>
+    <div className="flex h-screen">
       <Sidebar roles={session.roles || []} />
-      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+      <div className="flex flex-col flex-1">
         <Header user={session.user} />
-        <main style={{ flex: 1, padding: "20px" }}>{children}</main>
+        <main className="flex-1 p-5">{children}</main>
       </div>
     </div>
   );
