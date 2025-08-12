@@ -9,7 +9,6 @@ function requestRefreshOfAccessToken(token: JWT) {
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
       client_id: process.env.KEYCLOAK_CLIENT_ID!,
-      client_secret: process.env.KEYCLOAK_CLIENT_SECRET!,
       grant_type: "refresh_token",
       refresh_token: token.refreshToken!,
     }),
@@ -21,7 +20,7 @@ export const authOptions: AuthOptions = {
   providers: [
     KeycloakProvider({
       clientId: process.env.KEYCLOAK_CLIENT_ID!,
-      clientSecret: process.env.KEYCLOAK_CLIENT_SECRET!,
+      clientSecret: "", // Empty string for public clients
       issuer: process.env.KEYCLOAK_ISSUER!,
     }),
   ],
