@@ -1,4 +1,3 @@
-// src/components/Header.tsx
 "use client";
 import { User } from "next-auth";
 import Logout from "./Logout";

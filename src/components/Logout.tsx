@@ -1,4 +1,3 @@
-// src/components/Logout.tsx
 "use client";
 import federatedLogout from "@/utils/federatedLogout";
 

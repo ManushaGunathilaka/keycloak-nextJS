@@ -5,10 +5,9 @@ export default async function federatedLogout() {
     const response = await fetch("/api/auth/federated-logout");
     const data = await response.json();
     if (response.ok) {
-      // Sign out and redirect to the root page, clearing any callback URL
       await signOut({
         redirect: false,
-        callbackUrl: "/", // This ensures the callback URL is set to root
+        callbackUrl: "/",
       });
       window.location.href = data.url;
       return;
@@ -17,7 +16,6 @@ export default async function federatedLogout() {
   } catch (error) {
     console.log(error);
     alert(error);
-    // Also clear callback URL in error case
     await signOut({
       redirect: false,
       callbackUrl: "/",

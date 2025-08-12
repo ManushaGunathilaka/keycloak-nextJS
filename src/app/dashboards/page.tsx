@@ -1,12 +1,9 @@
-// src/app/dashboards/page.tsx
-
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export default async function Dashboard() {
   const session = await getServerSession(authOptions);
 
-  // Check if user has admin role
   const isAdmin = session?.roles?.includes("admin");
 
   if (!isAdmin) {
