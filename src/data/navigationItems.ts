@@ -1,5 +1,4 @@
 // src/data/navigationItems.ts
-
 export const navigationItems = [
   {
     name: "Dashboard",
