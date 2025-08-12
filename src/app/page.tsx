@@ -12,5 +12,9 @@ export default async function Home() {
   }
 
   // If user is authenticated, redirect to dashboard
-  redirect("/dashboards");
+  if (session.roles?.includes("admin")) {
+    redirect("/dashboards");
+  } else {
+    redirect("/dashboards/advertisement");
+  }
 }
