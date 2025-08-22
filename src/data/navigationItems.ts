@@ -1,22 +1,22 @@
 export const navigationItems = [
   {
     name: "Dashboard",
-    href: "/dashboards",
-    requiredRoles: ["SOFFCRICKET_ADMIN"],
+    href: "/dashboard",
+    requiredRoles: ["default-roles-resturant-uat"],
   },
   {
-    name: "Customers",
-    href: "/dashboards/customers",
-    requiredRoles: ["SOFFCRICKET_ADMIN"],
+    name: "Restaurant",
+    href: "/restaurant",
+    requiredRoles: ["default-roles-resturant-uat"],
   },
   {
-    name: "Advertisement",
-    href: "/dashboards/advertisement",
-    requiredRoles: ["SOFFCRICKET_ADMIN", "user"],
+    name: "Product Category",
+    href: "/productcategory",
+    requiredRoles: ["default-roles-resturant-uat", "CUSTOMER"],
   },
   {
-    name: "Orders",
-    href: "/dashboards/orders",
-    requiredRoles: ["SOFFCRICKET_ADMIN", "user"],
+    name: "Product",
+    href: "/product",
+    requiredRoles: ["default-roles-resturant-uat", "CUSTOMER"],
   },
 ];

@@ -9,9 +9,9 @@ export default async function Home() {
     redirect("/api/auth/signin");
   }
 
-  if (session.roles?.includes("SOFFCRICKET_ADMIN")) {
-    redirect("/dashboards");
+  if (session.roles?.includes("default-roles-resturant-uat")) {
+    redirect("/dashboard");
   } else {
-    redirect("/dashboards/advertisement");
+    redirect("/dashboard");
   }
 }

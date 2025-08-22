@@ -4,7 +4,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 export default async function Dashboard() {
   const session = await getServerSession(authOptions);
 
-  const isAdmin = session?.roles?.includes("SOFFCRICKET_ADMIN");
+  const isAdmin = session?.roles?.includes("default-roles-resturant-uat");
 
   if (!isAdmin) {
     return (
