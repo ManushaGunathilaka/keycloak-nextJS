@@ -9,7 +9,7 @@ export default async function Home() {
     redirect("/api/auth/signin");
   }
 
-  if (session.roles?.includes("admin")) {
+  if (session.roles?.includes("SOFFCRICKET_ADMIN")) {
     redirect("/dashboards");
   } else {
     redirect("/dashboards/advertisement");

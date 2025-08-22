@@ -16,11 +16,39 @@ function requestRefreshOfAccessToken(token: JWT) {
   });
 }
 
+// Helper function to extract roles from JWT payload
+function extractRolesFromToken(accessToken: string) {
+  try {
+    const payload = JSON.parse(atob(accessToken.split(".")[1]));
+    const realmRoles = payload.realm_access?.roles || [];
+    const resourceRoles: string[] = [];
+    if (payload.resource_access) {
+      Object.keys(payload.resource_access).forEach((resource) => {
+        const roles = payload.resource_access[resource]?.roles || [];
+        resourceRoles.push(...roles);
+      });
+    }
+    const allRoles = [...realmRoles, ...resourceRoles];
+    return {
+      realmRoles,
+      resourceRoles,
+      allRoles,
+    };
+  } catch (error) {
+    console.error("Error parsing access token:", error);
+    return {
+      realmRoles: [],
+      resourceRoles: [],
+      allRoles: [],
+    };
+  }
+}
+
 export const authOptions: AuthOptions = {
   providers: [
     KeycloakProvider({
       clientId: process.env.KEYCLOAK_CLIENT_ID!,
-      clientSecret: "", // Empty string for public clients
+      clientSecret: "",
       issuer: process.env.KEYCLOAK_ISSUER!,
     }),
   ],
@@ -35,26 +63,28 @@ export const authOptions: AuthOptions = {
         token.accessToken = account.access_token;
         token.refreshToken = account.refresh_token;
         token.expiresAt = account.expires_at;
+
         if (account.access_token) {
-          try {
-            const payload = JSON.parse(
-              atob(account.access_token.split(".")[1])
-            );
-            token.roles = payload.realm_access?.roles || [];
-          } catch (error) {
-            console.error("Error parsing access token:", error);
-            token.roles = [];
-          }
+          const { realmRoles, resourceRoles, allRoles } = extractRolesFromToken(
+            account.access_token
+          );
+          token.realmRoles = realmRoles;
+          token.resourceRoles = resourceRoles;
+          token.roles = allRoles;
         }
         return token;
       }
+
       if (Date.now() < token.expiresAt! * 1000 - 60 * 1000) {
+        console.log("Access Token: ", token.accessToken);
         return token;
       }
+
       try {
         const response = await requestRefreshOfAccessToken(token);
         const tokens: TokenSet = await response.json();
         if (!response.ok) throw tokens;
+
         const updatedToken: JWT = {
           ...token,
           idToken: tokens.id_token,
@@ -64,14 +94,16 @@ export const authOptions: AuthOptions = {
           ),
           refreshToken: tokens.refresh_token ?? token.refreshToken,
         };
+
         if (tokens.access_token) {
-          try {
-            const payload = JSON.parse(atob(tokens.access_token.split(".")[1]));
-            updatedToken.roles = payload.realm_access?.roles || [];
-          } catch (error) {
-            console.error("Error parsing refreshed access token:", error);
-          }
+          const { realmRoles, resourceRoles, allRoles } = extractRolesFromToken(
+            tokens.access_token
+          );
+          updatedToken.realmRoles = realmRoles;
+          updatedToken.resourceRoles = resourceRoles;
+          updatedToken.roles = allRoles;
         }
+
         return updatedToken;
       } catch (error) {
         console.error("Error refreshing access token", error);
@@ -82,6 +114,13 @@ export const authOptions: AuthOptions = {
       session.accessToken = token.accessToken;
       session.error = token.error;
       session.roles = token.roles;
+      session.realmRoles = token.realmRoles;
+      session.resourceRoles = token.resourceRoles;
+      console.log("Session roles:", {
+        allRoles: session.roles,
+        realmRoles: session.realmRoles,
+        resourceRoles: session.resourceRoles,
+      });
       return session;
     },
   },
